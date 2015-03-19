@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>House Count</title>
+    <style>
+        *{
+            line-height: 1.5em;
+        }
+        label{
+            display: inline-block;
+            width: 120px;
+            text-align: right;
+        }
+        input{
+            width: 50px;
+            overflow: hidden; 
+        }
+        .ui-val{
+            width: 50px;
+        }
+
+    </style>
+</head>
+<body>
+
+<label for="val-total-money">总价：</label>
+<input class="ui-val" type="text" name="val-total-money" id="val-total-money" value="350">
+<br>
+
+<label for="val-gao-dai">高贷：</label>
+<input class="ui-val" type="text" name="val-gao-dai" id="val-gao-dai" value="30">
+<br>
+
+<label for="val-li-lv">利率：</label>
+<input class="ui-val" type="text" name="val-li-lv" id="val-li-lv" value="5.9">
+<br>
+
+<label for="val-li-lv">公积金利率：</label>
+<input class="ui-val" type="text" name="val-li-lv-gjj" id="val-li-lv-gjj" value="4">
+<br>
+
+<label for="val-zhe-kou">折扣：</label>
+<input class="ui-val" type="text" name="val-zhe-kou" id="val-zhe-kou" value="0.93">
+<br>
+
+<label for="val-zhong-jie-fei">中介费：</label>
+<input class="ui-val" type="text" name="val-zhong-jie-fei" id="val-zhong-jie-fei" value="1.5">
+
+<br><br>
+
+<label for="val-shou-fu">首付：</label>
+<input type="text" name="val-shou-fu" id="val-shou-fu" value="0" readonly>
+<br>
+
+<label for="val-qi-shui">契税：</label>
+<input type="text" name="val-qi-shui" id="val-qi-shui" value="0" readonly>
+<br>
+
+<label for="val-zhong-jie">中介：</label>
+<input type="text" name="val-zhong-jie" id="val-zhong-jie" value="0" readonly>
+<br>
+
+<label for="val-yue-gong">月供：</label>
+<input type="text" name="val-yue-gong" id="val-yue-gong" value="0" readonly>
+<br>
+
+<label for="val-xiao-fei-dai">消费贷：</label>
+<input type="text" name="val-xiao-fei-dai" id="val-xiao-fei-dai" value="0" readonly>
+<br>
+
+<script src="./jquery-2.1.3.min.js"></script>
+<script type="text/javascript">
+    /**
+     * 等额本息计算公式：〔贷款本金×月利率×(1+月利率)^还款月数〕÷〔(1+月利率)^还款月数-1〕 
+     * 等额本金计算公式：每月还款金额 = (贷款本金 / 还款月数)+(本金 — 已归还本金累计额)×每月利率 
+     */
+    
+    (function(){
+        function count(){
+            var gongJiJin = 900000;
+            var monthNum = 360;
+
+            var totalMoney = $('#val-total-money').val() * 1;
+            var gaoDai = $('#val-gao-dai').val() * 1;
+            var liLv =  $('#val-li-lv').val() * 0.01;
+            var lilvGongJiJin = $('#val-li-lv-gjj').val() * 0.01;
+            var zheKou = $('#val-zhe-kou').val() * 1;
+            var zhongJieFei = $('#val-zhong-jie-fei').val() * 0.01;
+
+            var shouFu,qiShui,zhongJie,yueGong,xiaoFeiDai;
+
+            shouFu = totalMoney - (totalMoney + gaoDai) * 0.7;
+            qiShui = totalMoney * 0.7 * 0.01;
+            zhongJie = totalMoney * zhongJieFei;
+            yueGong = countMonth(gongJiJin, monthNum, lilvGongJiJin) + countMonth((totalMoney + gaoDai) * 0.7 * 10000 - gongJiJin, monthNum, liLv * zheKou);
+            xiaoFeiDai = 300000 * 5.75 * 0.01 * (1 + 0.20) / 12;
+
+            $('#val-shou-fu').val(shouFu);
+            $('#val-qi-shui').val(qiShui);
+            $('#val-zhong-jie').val(zhongJie);
+            $('#val-yue-gong').val(yueGong);
+            $('#val-xiao-fei-dai').val(xiaoFeiDai);
+        }
+
+        function countMonth(total, time, lv){
+            var liLv = lv;
+            var monthLiLv = liLv / 12;
+
+            var monthMoney = total * monthLiLv * Math.pow((1 + monthLiLv), time) / (Math.pow(1 + monthLiLv, time) - 1);
+            
+            return monthMoney;
+        }
+
+        $('#val-total-money, #val-gao-dai, #val-li-lv, #val-li-lv-gjj, #val-zhe-kou, #val-zhong-jie-fei').on('change', function(){
+            count();
+        });
+
+        count();
+    })();
+</script>
+</body>
+</html>
